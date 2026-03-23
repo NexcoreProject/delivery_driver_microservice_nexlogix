@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot-app
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 8085
+      # Opcional: si tienes base de datos, puedes agregar variables aquí
+      # SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mydb
+      # SPRING_DATASOURCE_USERNAME: user
+      # SPRING_DATASOURCE_PASSWORD: pass
+    # Si necesitas conectar con una base de datos en otro contenedor, agrega depends_on
+    # depends_on:
+    #   - db
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    # Para que Docker use BuildKit y así aprovechar el caché de Maven
+    # (opcional, también se puede habilitar en el daemon)
+    # build:
+    #   args:
+    #     BUILDKIT_PROGRESS: plain
